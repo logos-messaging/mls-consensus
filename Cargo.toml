@@ -1,0 +1,53 @@
+[workspace]
+resolver = "3"
+members = [
+  "mls-consensus-client",
+  "mls-consensus-program/core",
+  "mls-consensus-program/program",
+  "mls-consensus-program/methods",
+  "mls-consensus-program/methods/guest",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+# --- Local crates -------------------------------------------------------
+mls_consensus_core = { path = "mls-consensus-program/core" }
+mls_consensus_program = { path = "mls-consensus-program/program" }
+mls_consensus_methods = { path = "mls-consensus-program/methods" }
+mls_consensus_client = { path = "mls-consensus-client" }
+
+# --- LEZ / LEE crates, from the upstream repository ---------------------
+# Pinned by revision on purpose. A LEZ program is bound to the exact protocol
+# it was compiled against — the deployed public testnet already runs an older
+# account encoding than `master` — so an unpinned dependency would silently
+# change what this program can talk to. The client must stay on the same
+# revision as the program: it encodes accounts and instructions exactly the
+# way the program decodes them.
+#
+# Features are left to each consumer. `lee_core` in particular is built
+# without `host` for the guest and with it on the host side.
+lee = { git = "https://github.com/logos-blockchain/logos-execution-zone", rev = "a98ca4aa7d999fd8028d2ad9898c3c34f0c0c23f" }
+lee_core = { git = "https://github.com/logos-blockchain/logos-execution-zone", rev = "a98ca4aa7d999fd8028d2ad9898c3c34f0c0c23f" }
+common = { git = "https://github.com/logos-blockchain/logos-execution-zone", rev = "a98ca4aa7d999fd8028d2ad9898c3c34f0c0c23f" }
+wallet = { git = "https://github.com/logos-blockchain/logos-execution-zone", rev = "a98ca4aa7d999fd8028d2ad9898c3c34f0c0c23f" }
+sequencer_service_rpc = { git = "https://github.com/logos-blockchain/logos-execution-zone", rev = "a98ca4aa7d999fd8028d2ad9898c3c34f0c0c23f" }
+
+
+# --- Third party (versions matched to the upstream workspace) -----------
+anyhow = "1.0.98"
+bip39 = "2.1"
+borsh = "1.5.7"
+clap = { version = "4.5.42", features = ["derive", "env"] }
+hex = "0.4.3"
+risc0-build = "3.0.5"
+risc0-zkvm = { version = "3.0.5", default-features = false, features = ["std"] }
+serde = { version = "1.0.60", default-features = false, features = ["derive"] }
+serde_json = "1.0.81"
+thiserror = "2.0"
+tokio = { version = "1.50", features = ["macros", "rt-multi-thread", "time"] }
+url = { version = "2.5.4", features = ["serde"] }
+openmls = { version = "0.8.1", features = ["libcrux-provider"] }

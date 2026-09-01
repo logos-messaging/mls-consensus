@@ -1,0 +1,20 @@
+[package]
+name = "mls_consensus_methods"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# Compiles `guest/` for the RISC-V zkVM target and exposes the resulting ELF and image ID as
+# `CONVO_STATE_ELF` / `CONVO_STATE_ID` — risc0 names the constants after the guest binary.
+[package.metadata.risc0]
+methods = ["guest"]
+
+[build-dependencies]
+risc0-build.workspace = true
+
+[dev-dependencies]
+mls_consensus_core.workspace = true
+lee.workspace = true
+lee_core = { workspace = true, features = ["host"] }
+risc0-zkvm.workspace = true
+borsh.workspace = true

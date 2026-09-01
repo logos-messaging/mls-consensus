@@ -1,0 +1,9 @@
+[package]
+name = "mls_consensus_program"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+mls_consensus_core.workspace = true
+lee_core.workspace = true

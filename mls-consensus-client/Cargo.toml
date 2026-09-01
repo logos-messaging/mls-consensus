@@ -1,0 +1,46 @@
+[package]
+name = "mls-consensus-client"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Rust client for the LEZ MLS consensus program: read and advance a group's agreed state."
+
+
+[features]
+# Synchronous wrappers over the reader and writer, for consumers with no runtime of their own.
+# Off by default: an async consumer should not pay for a runtime it will never use. The base
+# dependency below is tokio's timer alone, which `ConvoStateReader::await_version` polls with;
+# this adds the runtime on top of it.
+blocking = ["tokio/rt-multi-thread"]
+
+[dependencies]
+# --- The program this client talks to -----------------------------------
+mls_consensus_core.workspace = true
+mls_consensus_methods.workspace = true
+
+# --- LEZ crates, pinned to the same revision as the program -------------
+lee.workspace = true
+lee_core = { workspace = true, features = ["host"] }
+common.workspace = true
+wallet.workspace = true
+sequencer_service_rpc = { workspace = true, features = ["client"] }
+
+# --- Third party --------------------------------------------------------
+anyhow.workspace = true
+thiserror.workspace = true
+# Deliberately not `workspace = true`: the base client needs the timer and nothing else, and
+# inheriting the workspace's feature list would pull the runtime in for every consumer. The
+# `blocking` feature adds it back for the callers that want it.
+tokio = { version = "1.50", default-features = false, features = ["time"] }
+url.workspace = true
+tempfile = "3.27.0"
+
+[dev-dependencies]
+# The blocking wrapper's tests need a runtime to prove they work from inside one.
+tokio = { workspace = true }
+
+# Gated on the feature it demonstrates, so a default `cargo test` skips it rather
+# than failing to resolve `blocking`.
+[[example]]
+name = "blocking_read"
+required-features = ["blocking"]

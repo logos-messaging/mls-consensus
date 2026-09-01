@@ -1,0 +1,14 @@
+[package]
+name = "mls_consensus_guest"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+mls_consensus_core.workspace = true
+mls_consensus_program.workspace = true
+lee_core.workspace = true
+risc0-zkvm.workspace = true
+
+[package.metadata.cargo-machete]
+ignored = ["risc0-zkvm"]
