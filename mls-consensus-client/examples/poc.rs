@@ -4,12 +4,17 @@
 
 use mls_consensus_client::{ConvoStateReader, ConvoStateWriter};
 
-const SEQUENCER: &str = "http://localhost:3040";
+/// The sequencer to talk to. Override to point at a remote one:
+/// `SEQUENCER_URL=http://1.2.3.4:3040 cargo run -p mls-consensus-client --example poc`
+fn sequencer() -> String {
+    std::env::var("SEQUENCER_URL").unwrap_or_else(|_| "http://68.183.19.197:3040".to_owned())
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // The writer's wallet is ephemeral, so this never touches ~/.lee/wallet.
-    let writer = ConvoStateWriter::new(SEQUENCER).await?;
+    let sequencer = sequencer();
+    let writer = ConvoStateWriter::new(&sequencer).await?;
 
     // Deploying an already-deployed program is a no-op: its identity is the hash of its bytecode.
     writer.deploy().await?;
@@ -20,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // `initialize` only submits, so wait for the group to exist before committing to it.
     writer.initialize().await?;
-    let reader = ConvoStateReader::connect(SEQUENCER, account)?;
+    let reader = ConvoStateReader::connect(&sequencer, account)?;
     reader.await_version(0).await?;
     println!("  initialized at v0");
 

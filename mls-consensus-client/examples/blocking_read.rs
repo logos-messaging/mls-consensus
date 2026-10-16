@@ -14,7 +14,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Note the absence of an `.await`, an executor, or a `block_on` at this call site: that is
     // the whole point of the wrapper.
-    let reader = BlockingReader::connect("http://localhost:3040", account)?;
+    let reader = BlockingReader::connect(&sequencer(), account)?;
 
     match reader.get()? {
         None => println!("{account} holds no group state"),
@@ -26,4 +26,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
+}
+
+/// The sequencer to talk to. Override to point at a remote one:
+/// `SEQUENCER_URL=http://1.2.3.4:3040 cargo run -p mls-consensus-client --example blocking_read`
+fn sequencer() -> String {
+    std::env::var("SEQUENCER_URL").unwrap_or_else(|_| "http://68.183.19.197:3040".to_owned())
 }

@@ -6,7 +6,11 @@
 
 use mls_consensus_client::{AccountId, ConvoStateReader};
 
-const SEQUENCER: &str = "http://localhost:3040";
+/// The sequencer to talk to. Override to point at a remote one:
+/// `SEQUENCER_URL=http://1.2.3.4:3040 cargo run -p mls-consensus-client --example reader`
+fn sequencer() -> String {
+    std::env::var("SEQUENCER_URL").unwrap_or_else(|_| "http://68.183.19.197:3040".to_owned())
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -15,7 +19,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .ok_or("usage: reader <ACCOUNT_ID>")?
         .parse()?;
 
-    match ConvoStateReader::connect(SEQUENCER, account)?.get().await? {
+    match ConvoStateReader::connect(&sequencer(), account)?
+        .get()
+        .await?
+    {
         None => println!("{account} holds no group state"),
         Some(state) => {
             println!("account: {account}");
